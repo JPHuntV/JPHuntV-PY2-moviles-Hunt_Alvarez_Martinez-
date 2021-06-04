@@ -4,58 +4,59 @@ import { Button, Dimensions, ScrollView,
          StyleSheet, Text, TextInput, View } from 'react-native';
 
 import TopBar from '../Components/TopBar';
+import BotBar from '../Components/BotBar'
 import { Picker } from '@react-native-community/picker';
 
 export default class InfoPersona extends Component{
     constructor(props){
         super(props)
         this.state = {
-            selectedSexo:'Hombre',
-            items:[],
-            selectedAnio:null,
-            selectedTipoId:null,
-            Provincias :[],
-            Cantones:[],
-            Distritos:[],
-            selectedProvinciaId:null,
-            selectedProvinciaN:null,
-            selectedCantonId:null,
-            selectedCantonN:null,
-            selectedDistritoId:null,
-            selectedDistritonN:null
+            selectedSexo:'Hombre',  items:[],
+            selectedAnio:1960,  selectedTipoId:'Cédula',Paises:[],
+            selectedPais:'Costa Rica',Provincias :[],Cantones:[],
+            Distritos:[],selectedProvinciaId:null,
+            selectedCantonId:null,selectedDistritoId:null,
+            Nombre: null,
+            Apellido1: null,
+            Apellido2: null,
+            NumIdentificacion: null,
+            Telefono1: null,
+            Telefono2: null,
+            idcuentaCiudadano :88//props.route.params.idcuentaCiudadano
         }
         this.initAnios()
         this.getProvincias()
-        
+        this.initPaises()
     }
     
     initAnios(){
-        var date = new Date()
-        for (let index = 1900; index < date.getFullYear()+1; index++) {
+        for (let index = 1900; index < 2011; index++) {
             this.state.items.push(<Picker.Item key='{index}' label={index.toString()} value={index} />)
         }
     }
 
+    initPaises(){
+        let paises = require('../resources/paises.json')
+        paises = paises['countries']
+        for(let pais in paises){
+            this.state.Paises.push(<Picker.Item key="{paises[pais]['id']}" label={paises[pais]['name']} value={paises[pais]['name']} />)
+        }
+        
+    }
     getProvincias(){
         fetch('https://ubicaciones.paginasweb.cr/provincias.json')
             .then(response => response.json())
             .then(data => this.initProvincias(data));
-        
     }
 
     initProvincias(data){
-        
         for(let obj in data){
             this.state.Provincias.push(<Picker.Item key='{obj}' label={data[obj]} value={obj} />)
         }
         this.setState({selectedProvinciaId:1})
-        this.setState({selectedProvinciaN:data[1]})
-        
     }
 
     getCantones(id){
-        console.log('\n######\n')
-        console.log('getCantones', id.toString())
         fetch('https://ubicaciones.paginasweb.cr/provincia/'+id+'/cantones.json')
             .then(response => response.json())
             .then(data =>  this.initCantones(data));
@@ -63,50 +64,82 @@ export default class InfoPersona extends Component{
 
     initCantones(data){
         this.setState({Cantones:[]})
-        console.log('\n##Cantones##\n')
         for(let obj in data){
             this.state.Cantones.push(<Picker.Item key='{obj}' label={data[obj]} value={obj} />)
-            console.log(obj, data[obj])
         }
         this.setState({selectedCantonId:1})
         this.getDistritos(this.state.selectedCantonId)
     }
     getDistritos(idCanton){
         var idProvincia = this.state.selectedProvinciaId
-        console.log('Provincia', idProvincia.toString())
-        console.log('Canton', idCanton.toString())
         fetch('https://ubicaciones.paginasweb.cr/provincia/'+idProvincia+'/canton/'+idCanton+'/distritos.json')
             .then(response => response.json())
             .then(data =>  this.initDistritos(data));
     }
 
     initDistritos(data){
-        console.log('\n##Distritos##\n')
         this.setState({Distritos:[]})
         for(let obj in data){
             this.state.Distritos.push(<Picker.Item key='{obj}' label={data[obj]} value={obj} />)
-            console.log(obj, data[obj])
         }
         this.setState({selectedDistritoId:1})
         
     }
+
+    guardarInfoPersona(){
+        var provincia = (this.state.Provincias[this.state.selectedProvinciaId-1]['props']['label'])
+        var canton =(this.state.Cantones[this.state.selectedCantonId-1]['props']['label'])
+        var distrito = (this.state.Distritos[this.state.selectedDistritoId-1]['props']['label'])
+        console.log('--->guardarInfo()')
+        fetch('http://192.168.0.156:3000/newInfoPersona',{
+            method:'POST',
+            headers:{
+                Accept:'application/json',
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({
+                Nombre:this.state.Nombre,
+                Apellido1:this.state.Apellido1,
+                Apellido2:this.state.Apellido2,
+                Sexo:this.state.selectedSexo,
+                AnioNacimiento:this.state.selectedAnio,
+                PaisNacimiento:this.state.selectedPais,
+                TipoIdentificacion:this.state.selectedTipoId,
+                NumIdentificacion:this.state.NumIdentificacion,
+                Provincia:provincia,
+                Canton:canton,
+                Distrito:distrito,
+                Telefono1:this.state.Telefono1,
+                Telefono2:this.state.Telefono2,
+                idcuentaCiudadano:this.state.idcuentaCiudadano
+            })
+        })
+        .then(response =>response.json())
+        .then(data => {})
+        .catch(error =>{
+            console.log(error)
+        })
+    }
     render(){
         return(
             <View style = {styles.container}>
-                <StatusBar style='light'></StatusBar>
+                <StatusBar style='auto'></StatusBar>
                 <View >
                     <TopBar/>
                 </View>
-                <View style={{flex:8, width:Dimensions.get('window').width}}>
+                <View style={{flex:11, width:Dimensions.get('window').width}}>
                     <ScrollView style = {styles.scroll}>
                         <Text style = {{fontSize:30, fontFamily: 'Roboto'}}>
                             Perfil del ciudadano
                         </Text>
                         <View style = {{borderColor:'black', borderWidth:1, padding:20}}>
-                            <TextInput placeholder= 'Nombre' style={[styles.textInput]}></TextInput>
+                            <TextInput placeholder= 'Nombre' style={[styles.textInput]}
+                                    onChangeText={(text) => this.setState({Nombre:text})}></TextInput>
                             <View  style= {{flexDirection:'row'}}>
-                                <TextInput placeholder='Primer apellido' style={[styles.textInput, {flex:2, marginRight:10}]}></TextInput>
-                                <TextInput placeholder= 'Segundo apellido' style={[styles.textInput, {flex:2, marginLeft:10}]}></TextInput>
+                                <TextInput placeholder='Primer apellido' style={[styles.textInput, {flex:2, marginRight:10}]}
+                                     onChangeText={(text) => this.setState({Apellido1:text})}></TextInput>
+                                <TextInput placeholder= 'Segundo apellido' style={[styles.textInput, {flex:2, marginLeft:10}]}
+                                     onChangeText={(text) => this.setState({Apellido2:text})}></TextInput>
                             </View>
                             <Text> Sexo:</Text>
                             <Picker
@@ -123,6 +156,12 @@ export default class InfoPersona extends Component{
                                 onValueChange={(itemValue, itemIndex) => this.setState({ selectedAnio: itemValue })}>
                                 {this.state.items}
                             </Picker>
+                            <Picker
+                                selectedValue={this.state.selectedPais}
+                                style={{ height: 50}}
+                                onValueChange={(itemValue, itemIndex) => this.setState({ selectedPais: itemValue })}>
+                                {this.state.Paises}
+                            </Picker>
                             <Text>Tipo de identificación</Text>
                             <Picker
                                 selectedValue={this.state.selectedTipoId}
@@ -133,7 +172,8 @@ export default class InfoPersona extends Component{
                                 <Picker.Item label="Pasaporte" value="Pasaporte" />
                                 <Picker.Item label="Otro" value="Otro" />
                             </Picker>
-                            <TextInput placeholder= 'Número de identificación' style={styles.textInput}></TextInput>
+                            <TextInput placeholder= 'Número de identificación' style={styles.textInput}
+                                onChangeText={(text) => this.setState({NumIdentificacion:text})}></TextInput>
                             <Text>Dirección</Text>
                             
 
@@ -170,38 +210,28 @@ export default class InfoPersona extends Component{
                             </View>
                             
                             <Text>Información de contacto</Text>
-                            <TextInput placeholder= 'Número de teléfono' style={styles.textInput}></TextInput>
-                            <TextInput placeholder= 'Número de teléfono adicional' style={styles.textInput}></TextInput>
-                            <TextInput placeholder= 'Correo electrónico' style={styles.textInput}></TextInput>
+                            <TextInput placeholder= 'Número de teléfono' style={styles.textInput}
+                                onChangeText={(text) => this.setState({Telefono1:text})}></TextInput>
+                            <TextInput placeholder= 'Número de teléfono adicional' style={styles.textInput}
+                                onChangeText={(text) => this.setState({Telefono2:text})}></TextInput>
                             <View style = {{flexDirection:'row', alignItems:'center'}}>
-                                <View style = {{flex:2}}><Button title='Cancelar' s></Button></View>
-                                <View style = {{flex:2}}><Button title='Guardar cambios'></Button></View>
+                                <View style = {{flex:2}}><Button title='Cancelar' ></Button></View>
+                                <View style = {{flex:2}}><Button title='Guardar cambios' onPress={()=>this.guardarInfoPersona()}></Button></View>
                             </View>
-                            
-
-
-
-
-
 
                         </View>
         
                     </ScrollView>
                 </View>
                 <View style = {{flex :1}}>
-                    <TopBar/>
+                    <BotBar/>
                 </View>
                 
             </View>
         )
     }
 }
-async function getProvincias() {
-    const response = await fetch('https://ubicaciones.paginasweb.cr/provincias.json');
-    var data = await response.json();
-    return data
-    
-}
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,

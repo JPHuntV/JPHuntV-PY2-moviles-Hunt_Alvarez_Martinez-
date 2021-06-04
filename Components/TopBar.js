@@ -9,14 +9,15 @@ export default class TopBar extends Component{
                     <Image style={styles.imagen} source ={imagenes['logo']}></Image>
                 </View>
                 <View style = {styles.perfilContainer}>
-                    <Text> aaaa</Text>
+                    <Image style={[styles.imagen]} source ={imagenes['user']}></Image>
                 </View>
             </View>
         )
     }
 }
 const imagenes = {
-    'logo': require('../img/munimovil.png')
+    'logo': require('../img/munimovil.png'),
+    'user': require('../img/user.png')
 }
 const styles = StyleSheet.create({
     container: {
@@ -24,18 +25,15 @@ const styles = StyleSheet.create({
         height:Dimensions.get('window').height*0.12,
         backgroundColor:'#4ecdc4',
         alignItems:'flex-end',
-        alignContent:'flex-end',
+        //alignContent:'flex-end',
         display: 'flex',
-        flexDirection: 'row'
-        //justifyContent: 'center'
+        flexDirection: 'row',
+        justifyContent: 'center'
     },
     imageContainer:{
-        flex:3,
+        flex:6,
         height:Dimensions.get('window').height*0.10,
-        //width:Dimensions.get('window').height*0.10*3,
-        borderColor:'green',
-        borderWidth:2
-        //paddingRight:20
+        justifyContent:'center'
     },
     imagen:{
         flex:1,
@@ -44,6 +42,11 @@ const styles = StyleSheet.create({
     perfilContainer:{
         flex:1,
         height:Dimensions.get('window').height*0.10,
-        backgroundColor:'yellow',
+        backgroundColor:'#4ecdc4',
+        justifyContent:'center',
+        alignItems:'center',
+        padding:25,
+        marginTop:200
+
     }
 })

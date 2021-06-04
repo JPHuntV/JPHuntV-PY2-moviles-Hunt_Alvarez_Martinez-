@@ -20,7 +20,8 @@ export default class Login extends Component{
                             <Text style = {styles.text} >Iniciar sesión</Text>
                         </TouchableOpacity>
                     </View>
-                    <Text style = {{
+                    <Text onPress={() => this.props.navigation.navigate('Register')}
+                        style = {{
                         fontSize:15,
                         color:'white',
                         marginVertical:10
