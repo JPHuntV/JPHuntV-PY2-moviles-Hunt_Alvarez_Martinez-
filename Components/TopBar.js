@@ -8,9 +8,6 @@ export default class TopBar extends Component{
                 <View style = {styles.imageContainer}>
                     <Image style={styles.imagen} source ={imagenes['logo']}></Image>
                 </View>
-                <View style = {styles.perfilContainer}>
-                    <Image style={[styles.imagen]} source ={imagenes['user']}></Image>
-                </View>
             </View>
         )
     }

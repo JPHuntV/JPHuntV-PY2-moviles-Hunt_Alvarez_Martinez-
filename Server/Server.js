@@ -16,35 +16,29 @@ var connection = mysql.createConnection({
     password:"JpHv04102K",
     database:"munimovil"
 });
-app.post('/newPersona', function(req, res) {
+
+//ok
+app.post('/RegisterCiudadano', function(req, res) {
     var reqBody = req.body
     const correo = reqBody.correo
     const clave = reqBody.clave
-    console.log(correo, clave)
-    var sql = 'INSERT INTO cuentaCiudadano (correo, clave) VALUES (?,?)'
-    connection.query(sql,[correo, clave], function(err, data) {
+    var sql = 'CALL RegisterCiudadano(?,?)'
+    connection.query(sql,[correo, clave], function(err, results, fields) {
         if(err){
             console.log(err.message)
             res.send({msj:false})
         }else{
             insertado = true
-            console.log('insertado')
-            res.send({msj:true})
+            var id =  results[0][0]['idcuentaCiudadano'] 
+            console.log('insertado:', id)
+            res.send({msj:true, idCiudadano:id})
         }   
     })    
 })
 
-app.post('/getId', function(req, res) {
-    var sql = 'SELECT idcuentaCiudadano FROM cuentaCiudadano ORDER BY idcuentaCiudadano DESC LIMIT 1'
-    connection.query(sql, function (error, results, fields) {
-        var id = null
-        id = results[0]['idcuentaCiudadano'] 
-        console.log(1, id)
-        res.send({id:id})
-    })
-})
 
-app.post('/newInfoPersona', function(req, res) {
+//ok
+app.post('/AddInfoCiudadano', function(req, res) {
     var reqBody = req.body
     console.log(reqBody)
     const Nombre = reqBody.Nombre
@@ -62,10 +56,7 @@ app.post('/newInfoPersona', function(req, res) {
     const Telefono2 = reqBody.Telefono2
     const idcuentaCiudadano = reqBody.idcuentaCiudadano
     console.log(Nombre, Apellido1, Apellido2)
-    var sql = 'INSERT INTO Ciudadano (Nombre, Apellido1,Apellido2,'+
-                'Sexo,AnioNacimiento,PaisNacimiento,TipoIdentificacion,'+
-                'NumIdentificacion,Provincia,Canton,Distrito,Telefono1,'+
-                'Telefono2,idCuentaCiudadano) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+    var sql = 'CALL AddInfoCiudadano(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
     connection.query(sql,[Nombre, Apellido1, Apellido2, Sexo, AnioNacimiento, 
                         PaisNacimiento, TipoIdentificacion, NumIdentificacion, 
                         Provincia, Canton, Distrito, Telefono1, Telefono2, idcuentaCiudadano], function(err, data) {
@@ -79,9 +70,30 @@ app.post('/newInfoPersona', function(req, res) {
         }   
     })    
 })
+
+app.post('/LoginUser', function(req, res) {
+    console.log('/loginUser')
+    var reqBody = req.body
+    const correo = reqBody.correo
+    const clave = reqBody.clave
+    var sql = 'CALL getUser(?,?)'
+    connection.query(sql,[correo, clave], function(err, results, fields) {
+        if(err){
+            console.log(err.message)
+            res.send({msj:false})
+        }else{
+            var id =  results[0][0]['idcuentaCiudadano'] 
+            console.log('user: ', id)
+            res.send({msj:true, idCiudadano:id})
+        }   
+    })    
+})
+
 app.get('/', (req, res) => {
     res.send('Successful response.');
   });
   
 
 app.listen(3000, () => console.log('Example app is listening on port 3000.'));
+
+

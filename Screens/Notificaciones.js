@@ -4,7 +4,6 @@ import { Button, Dimensions, ScrollView,
          StyleSheet, Text, TextInput, View } from 'react-native';
 
 import TopBar from '../Components/TopBar';
-import BotBar from '../Components/BotBar'
 import { Picker } from '@react-native-community/picker';
 
 
@@ -18,11 +17,10 @@ export default class Notificaciones extends Component{
                 </View>
                 <View style={{flex:11, width:Dimensions.get('window').width}}>
                     <ScrollView style = {styles.scroll}>
-
+                        <Text> Notificaciones</Text>
                     </ScrollView>
                 </View>
                 <View style = {{flex :1}}>
-                    <BotBar/>
                 </View>
             </View>
         )

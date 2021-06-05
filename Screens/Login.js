@@ -4,8 +4,41 @@ import { Button, StyleSheet, Image,
         TextComponent, TextInput, View, Text,
         Dimensions, 
         TouchableOpacity} from 'react-native';
-
+import md5 from 'md5'
 export default class Login extends Component{
+    constructor(props){
+        super(props)
+        this.state={
+            correo: 'dani21@gmail.com',//devolver a nulll!!!
+            clave:'1fa15033b7c585c603448edb6ee4875f',//devolver a null!!!!!
+        }
+    }
+
+    Login(){
+        console.log('---->Login()')
+        fetch('http://192.168.0.156:3000/LoginUser',{
+            method:'POST',
+            headers:{
+                Accept:'application/json',
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({
+                correo:this.state.correo,
+                clave:this.state.clave
+            })
+        })
+        .then(response =>response.json())
+        .then(data => {
+            if(data['msj']){
+                console.log('id del ciudadano: [', data['idCiudadano'], ']')
+                this.props.navigation.navigate('InicioPersona', {idcuentaCiudadano: data['idCiudadano']})
+            }
+        })
+        .catch(error =>{
+            console.log(error)
+        })
+    }
+
     render(){
         return(
             <View style = {styles.container}>
@@ -13,10 +46,12 @@ export default class Login extends Component{
                     <Image style={styles.imagen} source ={imagenes['logo']}></Image>
                 </View>
                 <View style = {styles.credenciales}>
-                    <TextInput style = {[styles.textInput, styles.text]} placeholder='Correo'></TextInput>
-                    <TextInput style = {[styles.textInput, styles.text]} placeholder = 'Clave'></TextInput>
+                    <TextInput onChangeText={(text) => this.setState({correo:text})} 
+                        style = {[styles.textInput, styles.text]} placeholder='Correo'></TextInput>
+                    <TextInput onChangeText={(text) => this.setState({clave:md5(text)})}
+                                secureTextEntry style = {[styles.textInput, styles.text]} placeholder = 'Clave'></TextInput>
                     <View style={styles.botonInicioC} >
-                        <TouchableOpacity style={styles.botonInicio} title='Login'>
+                        <TouchableOpacity onPress={() => this.Login()} style={styles.botonInicio} title='Login'>
                             <Text style = {styles.text} >Iniciar sesión</Text>
                         </TouchableOpacity>
                     </View>

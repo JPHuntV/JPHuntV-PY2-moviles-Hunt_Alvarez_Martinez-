@@ -4,8 +4,9 @@ import { Button, Dimensions, ScrollView,
          StyleSheet, Text, TextInput, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import TopBar from '../Components/TopBar';
-import BotBar from '../Components/BotBar'
+//import BotBar from '../Components/BotBar'
 import { Picker } from '@react-native-community/picker';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 
 export default class NuevoReporte extends Component{
@@ -14,12 +15,18 @@ export default class NuevoReporte extends Component{
         this.state = {
             selectedTipo:'Hombre',
             selectedProblema: 'a',
-            date:new Date()
+            date:null
         }
         
     }
-    test(){
-        console.log('a')
+    
+    getDate(){
+        var today = new Date();
+        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        var dateTime = date+' '+time;
+        console.log(dateTime)
+        this.setState({date:dateTime})
     }
     render(){
         const { date } = this.state;
@@ -51,17 +58,14 @@ export default class NuevoReporte extends Component{
                                 <Picker.Item label="Hombre" value="Hombre" />
                                 <Picker.Item label="Mujer" value="Mujer" />
                             </Picker>
-                            <Text>sss</Text>
-                            <DateTimePicker 
-                                value={ date }
-                                mode='default'
-                                display='default'
-                                onChange={ date => this.setState({ date:date }) } />
+                            <Text>Fecha y hora</Text>
+                            <Text>{this.state.date}</Text>
+                            <TouchableOpacity onPress={()=>this.getDate()}><Text>test</Text></TouchableOpacity>
                         </View>
                     </ScrollView>
                 </View>
                 <View style = {{flex :1}}>
-                    <BotBar/>
+                    
                 </View>
             </View>
         )

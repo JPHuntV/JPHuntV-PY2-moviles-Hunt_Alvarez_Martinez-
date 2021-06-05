@@ -19,7 +19,7 @@ export default class Register extends Component{
 
     registrar(){
         if(this.state.clave1 == this.state.clave2){
-            fetch('http://192.168.0.156:3000/newPersona',{
+            fetch('http://192.168.0.156:3000/RegisterCiudadano',{
                 method:'POST',
                 headers:{
                     Accept:'application/json',
@@ -33,21 +33,8 @@ export default class Register extends Component{
             .then(response =>response.json())
             .then(data => {
                 if(data['msj']){
-                    fetch('http://192.168.0.156:3000/getId',{
-                        method:'POST',
-                        headers:{
-                            Accept:'application/json',
-                            'Content-Type':'application/json'
-                        }
-                    })
-                    .then(response =>response.json())
-                    .then(data => {
-                        idCiudadano = data['id']
-                        this.props.navigation.navigate('InfoPersona',{idcuentaCiudadano: idCiudadano})
-                    })
-                    .catch(error =>{
-                        console.log(error)
-                    })
+                    console.log('id del ciudadano: [', data['idCiudadano'], ']')
+                    this.props.navigation.navigate('InfoPersona',{screen:'InfoPersona',params: {idcuentaCiudadano: data['idCiudadano']}})
                 }
             })
             .catch(error =>{

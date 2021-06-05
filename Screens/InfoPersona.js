@@ -4,7 +4,6 @@ import { Button, Dimensions, ScrollView,
          StyleSheet, Text, TextInput, View } from 'react-native';
 
 import TopBar from '../Components/TopBar';
-import BotBar from '../Components/BotBar'
 import { Picker } from '@react-native-community/picker';
 
 export default class InfoPersona extends Component{
@@ -22,8 +21,9 @@ export default class InfoPersona extends Component{
             NumIdentificacion: null,
             Telefono1: null,
             Telefono2: null,
-            idcuentaCiudadano :88//props.route.params.idcuentaCiudadano
+            idcuentaCiudadano : props.route.params.idcuentaCiudadano 
         }
+        console.log(this.state.idcuentaCiudadano)
         this.initAnios()
         this.getProvincias()
         this.initPaises()
@@ -91,7 +91,7 @@ export default class InfoPersona extends Component{
         var canton =(this.state.Cantones[this.state.selectedCantonId-1]['props']['label'])
         var distrito = (this.state.Distritos[this.state.selectedDistritoId-1]['props']['label'])
         console.log('--->guardarInfo()')
-        fetch('http://192.168.0.156:3000/newInfoPersona',{
+        fetch('http://192.168.0.156:3000/AddInfoCiudadano',{
             method:'POST',
             headers:{
                 Accept:'application/json',
@@ -224,7 +224,6 @@ export default class InfoPersona extends Component{
                     </ScrollView>
                 </View>
                 <View style = {{flex :1}}>
-                    <BotBar/>
                 </View>
                 
             </View>
