@@ -96,6 +96,48 @@ app.post('/LoginUser', function(req, res) {
     })    
 })
 
+app.post('/addReporte', function(req, res) {
+    console.log('/addReporte')
+    var reqBody = req.body
+    
+
+    const idCiudadano =reqBody.idCiudadano
+    const tipoReporte =reqBody.tipoReporte
+    const tipoProblema =reqBody.tipoProblema
+    const fechaHora =reqBody.fechaHora
+    const descripcion =reqBody.descripcion
+    const latitud =reqBody.latitud
+    const longitud =reqBody.longitud
+    const estado =reqBody.estado
+
+    console.log(idCiudadano)
+    console.log(tipoReporte)
+    console.log(tipoProblema)
+    console.log(fechaHora)
+    console.log(descripcion)
+    console.log(latitud.tos)
+    console.log(longitud)
+    console.log(estado)
+    var sql = 'CALL AddReporte(?,?,?,?,?,?,?,?)'
+    connection.query(sql,[idCiudadano,
+                        tipoReporte,
+                        tipoProblema,
+                        fechaHora,
+                        descripcion,
+                        latitud,
+                        longitud,
+                        estado], function(err, results, fields) {
+        if(err){
+            console.log(err.message)
+            res.send({msj:false})
+        }else{
+            var id =  results[0][0]['idReporte'] 
+            console.log('Reporte: ', id)
+            res.send({msj:true, idReporte:id})
+        }   
+    })   
+})
+
 app.get('/', (req, res) => {
     res.send('Successful response.');
   });
@@ -106,9 +148,13 @@ app.listen(3000, () => console.log('Example app is listening on port 3000.'));
 
 
 app.post('/foto', (req, res) => {
-    fs.writeFile('./uploads/'+req.body.uri+'.png', req.body.imgsource, 'base64', (err) => {
+    fs.writeFile('./uploads/'+req.body.idCiudadano+
+                                req.body.idReporte+
+                                req.body.id+'.png', req.body.imgsource, 'base64', (err) => {
       if (err) throw err
     })
     res.status(200)
   })
+
+
 

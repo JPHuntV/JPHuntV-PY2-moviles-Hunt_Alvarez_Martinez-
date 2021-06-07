@@ -6,7 +6,7 @@ import TopBar from '../Components/TopBar';
 import { Picker } from '@react-native-community/picker';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import DocPicker, { getFotos } from '../Components/FileUploader';
-import Map from '../Components/Map';
+import Map, { getLat, getLon } from '../Components/Map';
 
 
 
@@ -44,9 +44,9 @@ export default class NuevoReporte extends Component{
         this.setState({date:dateTime})
     }
 
-    guardarFoto(){
+    guardarFoto(id){
         var Fotos = getFotos()
-        console.log(Fotos.length)
+        console.log('cantidad de fotos:  ', Fotos.length)
         var index = 0
         Fotos.forEach(image => {
             console.log(image)
@@ -62,7 +62,9 @@ export default class NuevoReporte extends Component{
                         },
                         body: JSON.stringify({
                             imgsource: image.base64,
-                            uri:index
+                            index:'id'+index.toString(),
+                            idReporte: 'rep'+id.toString(),
+                            idCiudadano:'ci'+idcuentaCiudadano.toString()
                         }),
                     })
                 index++
@@ -74,6 +76,7 @@ export default class NuevoReporte extends Component{
 
 
     onLongPress = ({nativeEvent}) => {
+      
         console.log(nativeEvent)
         this.setState({puntoTemp :nativeEvent.coordinate})
 
@@ -85,25 +88,56 @@ export default class NuevoReporte extends Component{
         for(var obj in tipos){
             this.state.tiposItems.push(<Picker.Item key='{obj}' label={obj} value={obj} />)
         }
+        this.state.selectedTipo = 'Limpieza'
         this.initProblemas('Limpieza')
         
     }
 
     initProblemas(itemValue){
         var tipos = require('../resources/TipoProblemas.json')
+        var selected = null
         for(var tipo in tipos[itemValue]){
-            console.log(tipo)
+            if(selected == null) selected = tipo
             this.state.tiposProblemasItems.push(<Picker.Item key='{obj}' label={tipo} value={tipo} />)
         }
+        this.state.selectedProblema = selected
         
     }
     guardarReporte(){
-        
-        for(var obj in tipos){
-            console.log(obj)
-            for(var tipo in tipos[obj]){
-                console.log(tipo)
-            }
+        if(this.state.descripcion != ''){
+            this.setState({alertaDesc:null})
+            fetch('http://192.168.0.156:3000/AddReporte', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    idCiudadano: this.state.idcuentaCiudadano,
+                    tipoReporte: this.state.selectedTipo,
+                    tipoProblema: this.state.selectedProblema,
+                    fechaHora: this.state.date,
+                    descripcion: this.state.descripcion,
+                    latitud:getLat(),
+                    longitud:getLon(),
+                    estado:'En revisión',
+                    alertaDesc:null
+                }),
+            })
+            .then(response =>response.json())
+            .then(data => {
+                if(data['msj']){
+                    console.log('id del reporte: [', data['idReporte'], ']')
+                    this.guardarFoto( data['idReporte'])
+                    //this.props.navigation.navigate('InicioPersona', {idcuentaCiudadano: data['idCiudadano']})
+                }
+            })
+            .catch(error =>{
+                console.log(error)
+            })
+        }else{
+            console.log('es nulo')
+            this.setState({alertaDesc:<Text style={{color:'red'}}>*Este campo es obligatorio</Text>})
         }
     }
 
@@ -151,6 +185,7 @@ export default class NuevoReporte extends Component{
                             <DocPicker/>
                             <TouchableOpacity style = {{margin:10, backgroundColor:'red'}} onPress={() => this.guardarFoto()}><Text>asdfsdfs</Text></TouchableOpacity>
                             <Text> descripcion</Text>
+                            {this.state.alertaDesc}
                             <TextInput 
                                 multiline={true} 
                                 numberOfLines={5} 
