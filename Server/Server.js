@@ -1,14 +1,21 @@
 const express = require('express');
 const bodyParser = require('body-parser')
+const fs = require('fs')
 const mysql = require('mysql')
 const app = express()
 
+var multer  = require('multer')
+var upload = multer({ dest: 'uploads/' })
+
+
 
 app.use( express.static( "public" ) );
-app.use( bodyParser.json() );       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-  extended: true
-})); 
+
+
+app.use(bodyParser.json({limit: '15mb', extended: true}))
+app.use(bodyParser.urlencoded({limit: '15mb', extended: true}))
+
+
 
 var connection = mysql.createConnection({
     host: "db-py2-moviles-hunt-alvarez-martinez.cdseqvbeenn9.us-east-2.rds.amazonaws.com",
@@ -96,4 +103,12 @@ app.get('/', (req, res) => {
 
 app.listen(3000, () => console.log('Example app is listening on port 3000.'));
 
+
+
+app.post('/foto', (req, res) => {
+    fs.writeFile('./uploads/'+req.body.uri+'.png', req.body.imgsource, 'base64', (err) => {
+      if (err) throw err
+    })
+    res.status(200)
+  })
 

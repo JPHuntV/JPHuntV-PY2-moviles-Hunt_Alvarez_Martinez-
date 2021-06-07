@@ -1,0 +1,16 @@
+
+{
+    "Limpieza":{
+        "Botaderos Clandestinos":"Botaderos Clandestinos",
+        "Acumulación de basura": "Acumulación de basura"
+    },
+    "Infraestructura":{
+        "Calles en mal estado":"Calles en mal estado",
+        "Puentes" : "Puentes",
+        "Acueductos" : "Acueductos",
+        "Alumbrado" : "Alumbrado"
+    },
+    "Seguridad":{
+        "Seguridad":"Seguridad"
+    }
+}
